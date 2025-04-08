@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominica Reisroute 11-14 April</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvIMHAf3ole4qp-0OcDOGScYNa6M_OA8A&libraries=places" defer></script>
+    <script src="data.js" defer></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Reisplanning Dominica – 11 t/m 14 april</h1>
+        <div class="controls">
+            <button id="day1" class="active"><span class="color-dot day1"></span> Dag 1: Oostkust & Kalinago-territorium</button>
+            <button id="day2"><span class="color-dot day2"></span> Dag 2: Morne Trois Pitons NP</button>
+            <button id="day3"><span class="color-dot day3"></span> Dag 3: Zuidwestkust & snorkelen</button>
+            <button id="day4"><span class="color-dot day4"></span> Dag 4: Noordkust & Indian River</button>
+            <button id="all-days">Alle dagen</button>
+        </div>
+        <div class="map-container">
+            <div class="locations-panel">
+                <h2>Locaties</h2>
+                <div id="locations-list" class="locations-list">
+                    <!-- Locaties worden hier dynamisch ingevuld vanuit JavaScript -->
+                </div>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+</body>
+</html> 
