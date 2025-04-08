@@ -1,6 +1,29 @@
-# Dominica Reisroute Kaart
+# Dominica Reisroute App
 
-Deze interactieve kaart toont de reisroutes voor een vierdaagse reis (11-14 april) in Dominica.
+Een interactieve kaart-applicatie voor het plannen van een reis naar Dominica.
+
+## Functies
+- Interactieve Google Maps integratie
+- Dagindeling van activiteiten
+- Gedetailleerde informatie over locaties
+- Responsief ontwerp voor desktop, tablet en mobiel gebruik
+
+## Mobiel gebruik
+Deze applicatie is volledig geoptimaliseerd voor gebruik op mobiele apparaten. Je kunt het op de volgende manieren mobiel gebruiken:
+
+1. **Via een online link**: Bezoek de GitHub Pages URL (indien gehost)
+2. **Als webapp**: Voeg de website toe aan je startscherm op iOS of Android voor een app-achtige ervaring
+
+## Lokale installatie
+Om de applicatie lokaal te draaien:
+
+1. Clone de repository
+2. Open index.html in een webbrowser
+
+## GitHub Pages
+Deze applicatie is ook beschikbaar via GitHub Pages op:
+[https://USERNAME.github.io/dominica-map](https://USERNAME.github.io/dominica-map)
+(Vervang 'USERNAME' door je eigen GitHub gebruikersnaam na het publiceren)
 
 ## Functionaliteiten
 
