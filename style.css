@@ -179,6 +179,14 @@ button .color-dot {
 
 /* Responsive aanpassingen */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
     .map-container {
         flex-direction: column;
         height: auto;
@@ -192,11 +200,49 @@ button .color-dot {
     }
     
     #map {
-        height: 500px;
+        height: 400px;
+    }
+    
+    .controls {
+        gap: 5px;
     }
     
     button {
-        padding: 6px 10px;
-        font-size: 0.9rem;
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra kleine schermen zoals telefoons */
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+    
+    .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+    }
+    
+    button {
+        padding: 5px;
+        font-size: 0.75rem;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .locations-panel {
+        height: 250px;
+        max-height: 250px;
+    }
+    
+    #map {
+        height: 350px;
     }
 } 
