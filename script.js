@@ -304,7 +304,7 @@ function correctLocation(day, locationName, query) {
     });
 }
 
-// Event listeners voor knoppen
+// Functie om event listeners voor knoppen in te stellen
 function setupEventListeners() {
     document.getElementById('day1').addEventListener('click', () => {
         setActiveButton('day1');
@@ -330,6 +330,42 @@ function setupEventListeners() {
         setActiveButton('all-days');
         showAllDays();
     });
+    
+    // Voeg de mobiele toggle knop toe voor de locatielijst
+    setupMobileListToggle();
+}
+
+// Functie om de mobiele toggle voor de locatielijst in te stellen
+function setupMobileListToggle() {
+    // Controleer of we op een mobiel apparaat zijn (max-width: 768px)
+    if (window.matchMedia("(max-width: 768px)").matches) {
+        // Maak de toggle knop aan
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'toggle-list-button';
+        toggleButton.innerHTML = '<i class="fas fa-list"></i> Toon lijst';
+        toggleButton.setAttribute('data-state', 'small');
+        
+        // Voeg de knop toe aan de map-container
+        document.querySelector('.map-container').appendChild(toggleButton);
+        
+        // Voeg de event listener toe
+        toggleButton.addEventListener('click', function() {
+            const leftSidebar = document.querySelector('.left-sidebar');
+            const state = this.getAttribute('data-state');
+            
+            if (state === 'small') {
+                // Toon volledige lijst
+                leftSidebar.style.maxHeight = '60vh';
+                this.innerHTML = '<i class="fas fa-map"></i> Toon kaart';
+                this.setAttribute('data-state', 'large');
+            } else {
+                // Toon kleine lijst
+                leftSidebar.style.maxHeight = '200px';
+                this.innerHTML = '<i class="fas fa-list"></i> Toon lijst';
+                this.setAttribute('data-state', 'small');
+            }
+        });
+    }
 }
 
 // Activeer de juiste knop
