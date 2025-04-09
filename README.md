@@ -22,8 +22,7 @@ Om de applicatie lokaal te draaien:
 
 ## GitHub Pages
 Deze applicatie is ook beschikbaar via GitHub Pages op:
-[https://USERNAME.github.io/dominica-map](https://USERNAME.github.io/dominica-map)
-(Vervang 'USERNAME' door je eigen GitHub gebruikersnaam na het publiceren)
+[https://PelleHendrix.github.io/dominica-map](https://PelleHendrix.github.io/dominica-map)
 
 ## Functionaliteiten
 
