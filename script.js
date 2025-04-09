@@ -12,11 +12,85 @@ let driveTimes = {}; // Om rijtijden tussen locaties op te slaan
 let driveDistances = {}; // Om afstanden tussen locaties op te slaan
 let placesService; // Places API service
 
-// Map initialiseren wanneer het document is geladen
-document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    setupEventListeners();
-});
+// Functie om het .env bestand te lezen
+async function getEnvConfig() {
+    try {
+        const response = await fetch('/.env');
+        const text = await response.text();
+        
+        // Eenvoudige parser voor .env bestand
+        const config = {};
+        text.split('\n').forEach(line => {
+            // Negeer commentaarregels en lege regels
+            if (line.startsWith('#') || line.trim() === '') return;
+            
+            const [key, value] = line.split('=');
+            if (key && value) {
+                config[key.trim()] = value.trim();
+            }
+        });
+        
+        return config;
+    } catch (error) {
+        console.error("Kan het .env bestand niet laden:", error);
+        // Fallback naar hardcoded sleutel (niet ideaal, maar werkt als fallback)
+        return { GOOGLE_MAPS_API_KEY: 'AIzaSyBvIMHAf3ole4qp-0OcDOGScYNa6M_OA8A' };
+    }
+}
+
+// Functie om Google Maps API script dynamisch te laden
+function loadGoogleMapsScript(apiKey) {
+    return new Promise((resolve, reject) => {
+        // Maak een script element aan
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMapCallback`;
+        script.async = true;
+        script.defer = true;
+        
+        // Voeg een globale callback toe die Promise zal resolveren
+        window.initMapCallback = function() {
+            resolve();
+            delete window.initMapCallback;
+        };
+        
+        // Error handler
+        script.onerror = function() {
+            reject(new Error('Google Maps script failed to load.'));
+        };
+        
+        // Voeg script toe aan DOM
+        document.head.appendChild(script);
+    });
+}
+
+// Start de applicatie
+async function startApp() {
+    try {
+        // Haal de configuratie op uit het .env bestand
+        const config = await getEnvConfig();
+        
+        // Laad de Google Maps API
+        await loadGoogleMapsScript(config.GOOGLE_MAPS_API_KEY);
+        
+        // Initialiseer de kaart na het laden van de API
+        initMap();
+        setupEventListeners();
+        
+        // Voeg een functie toe om de huidige infoWindow te sluiten
+        window.closeCurrentInfoWindow = function() {
+            if (infoWindow) {
+                infoWindow.close();
+            }
+        };
+    } catch (error) {
+        console.error("Fout bij het starten van de applicatie:", error);
+        document.getElementById('map').innerHTML = 
+            '<div style="padding: 20px; text-align: center;">Er is een fout opgetreden bij het laden van de kaart. Probeer de pagina te vernieuwen.</div>';
+    }
+}
+
+// Start de app wanneer het document is geladen
+document.addEventListener('DOMContentLoaded', startApp);
 
 // Google Maps initialiseren
 function initMap() {
@@ -492,9 +566,9 @@ function highlightLocation(locationItem) {
         let directLinkHtml = '';
         if (point.directMapLink) {
             directLinkHtml = `
-                <div style="margin-top: 10px;">
-                    <a href="${point.directMapLink}" target="_blank" style="color: #4285F4; text-decoration: none; display: flex; align-items: center;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#4285F4" style="margin-right: 5px;">
+                <div style="margin-top: 8px;">
+                    <a href="${point.directMapLink}" target="_blank" style="color: #4285F4; text-decoration: none; display: flex; align-items: center; font-size: 12px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#4285F4" style="margin-right: 4px;">
                             <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
                         </svg>
                         Directe link naar locatie
@@ -508,16 +582,16 @@ function highlightLocation(locationItem) {
         const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
         
         const infoContent = `
-            <div class="info-window" style="min-width: 250px; padding: 5px;">
-                <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">${point.name}</div>
-                <div style="font-size: 14px;">${point.description || ''}</div>
+            <div class="info-window" style="padding: 8px; min-width: 200px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); border-radius: 4px; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <div style="font-size: 16px; font-weight: bold;">${point.name}</div>
+                    <div class="custom-close-button" onclick="window.closeCurrentInfoWindow()">×</div>
+                </div>
+                <div style="font-size: 13px; color: #444;">${point.description || ''}</div>
                 ${directLinkHtml}
-                <div style="margin-top: 10px; background-color: #4CAF50; padding: 8px; border-radius: 4px;">
-                    <a href="${googleSearchUrl}" target="_blank" style="color: white; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" style="margin-right: 5px;">
-                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                        </svg>
-                        Zoeken naar ${point.name}
+                <div style="margin-top: 8px; text-align: center;">
+                    <a href="${googleSearchUrl}" target="_blank" style="color: white; text-decoration: none; display: inline-block; background-color: #4CAF50; padding: 4px 8px; border-radius: 4px; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
+                        Google zoeken
                     </a>
                 </div>
             </div>`;
@@ -596,29 +670,46 @@ function addMarkers(waypoints, defaultColor, day) {
             infoWindow.close();
             
             // Maak HTML voor infoWindow
+            const searchQuery = encodeURIComponent(`${point.name} dominica`);
+            const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+            
             let contentString = `
-                <div class="info-window">
-                    <h3>${point.name}</h3>`;
+                <div class="info-window" style="padding: 8px; min-width: 200px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); border-radius: 4px; position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <div style="font-size: 16px; font-weight: bold;">${point.name}</div>
+                        <div class="custom-close-button" onclick="window.closeCurrentInfoWindow()">×</div>
+                    </div>`;
             
             if (point.description) {
-                contentString += `<p>${point.description}</p>`;
+                contentString += `<div style="font-size: 13px; color: #444;">${point.description}</div>`;
             }
             
             if (point.activityType) {
                 contentString += `
-                    <div class="activity-type" style="background-color: ${ACTIVITY_COLORS[point.activityType] || '#999'}">
+                    <div style="display: inline-block; padding: 2px 6px; border-radius: 3px; color: white; font-size: 11px; margin: 5px 0; background-color: ${ACTIVITY_COLORS[point.activityType] || '#999'}">
                         ${point.activityType.charAt(0).toUpperCase() + point.activityType.slice(1)}
                     </div>`;
             }
             
             if (point.directMapLink) {
                 contentString += `
-                    <a href="${point.directMapLink}" target="_blank" class="map-link-button">
-                        <i class="fas fa-map-marked-alt"></i> In Google Maps openen
-                    </a>`;
+                    <div style="margin: 5px 0;">
+                        <a href="${point.directMapLink}" target="_blank" style="color: #4285F4; text-decoration: none; display: flex; align-items: center; font-size: 12px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#4285F4" style="margin-right: 4px;">
+                                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+                            </svg>
+                            Directe link naar locatie
+                        </a>
+                    </div>`;
             }
             
-            contentString += `</div>`;
+            contentString += `
+                <div style="margin-top: 8px; text-align: center;">
+                    <a href="${googleSearchUrl}" target="_blank" style="color: white; text-decoration: none; display: inline-block; background-color: #4CAF50; padding: 4px 8px; border-radius: 4px; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
+                        Google zoeken
+                    </a>
+                </div>
+            </div>`;
             
             // Open InfoWindow op de marker
             infoWindow.setContent(contentString);

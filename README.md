@@ -69,4 +69,50 @@ Als de routes niet correct worden weergegeven:
 
 ## Credits
 
-Ontwikkeld voor een 4-daagse reis naar Dominica. Gebruik voor persoonlijke doeleinden. 
+Ontwikkeld voor een 4-daagse reis naar Dominica. Gebruik voor persoonlijke doeleinden.
+
+## Installatie
+
+1. Clone de repository:
+   ```
+   git clone <repository-url>
+   cd dominica-map
+   ```
+
+2. Maak een `.env` bestand aan in de hoofdmap met uw Google Maps API sleutel:
+   ```
+   # .env bestand
+   GOOGLE_MAPS_API_KEY=jouw_google_maps_api_sleutel_hier
+   ```
+
+   > **Let op**: Het `.env` bestand wordt niet meegenomen in Git voor veiligheidsredenen. Zorg ervoor dat je je API-sleutel niet deelt of publiceert.
+
+3. Open `index.html` in een webbrowser.
+
+## Functies
+
+- Interactieve kaart met reisroutes per dag
+- Gedetailleerde locatie-informatie met reistijden en afstanden
+- Kleurgecodeerde activiteiten
+- Responsive ontwerp voor verschillende schermformaten
+
+## Ontwikkeling
+
+### Projectstructuur
+- `index.html` - Hoofdpagina
+- `style.css` - Stijlen
+- `script.js` - JavaScript code
+- `data.js` - Reisdata en configuratie
+- `.env` - Omgevingsbestand voor gevoelige informatie (niet in Git)
+
+### API sleutel instellen
+Om de Google Maps API te gebruiken, moet je je eigen API-sleutel instellen in het `.env` bestand:
+
+1. Maak een Google Cloud Platform account aan
+2. Maak een project en activeer de Maps JavaScript API
+3. Maak een API sleutel 
+4. Voeg de sleutel toe aan je `.env` bestand
+
+## Licentie
+
+Dit project is beschikbaar onder de MIT-licentie. 
