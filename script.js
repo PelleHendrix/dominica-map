@@ -385,11 +385,42 @@ function createLocationItem(point, index, day) {
     const title = document.createElement('h3');
     title.textContent = `${index + 1}. ${point.name}`;
     
+    // Als het Rosalie Bay Airbnb is (dag 1, punt 4), voeg een directe link toe
+    if (point.directMapLink) {
+        // Maken van de link container
+        const linkContainer = document.createElement('div');
+        linkContainer.className = 'direct-link-container';
+        
+        // Maken van de directe link
+        const directLink = document.createElement('a');
+        directLink.href = point.directMapLink;
+        directLink.target = '_blank';
+        directLink.className = 'airbnb-direct-link';
+        directLink.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#4285F4" style="vertical-align: middle; margin-right: 5px;">
+                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+            </svg>
+            Directe link naar Airbnb locatie
+        `;
+        
+        // Voorkom dat de klik op de link ook de locatie activeert
+        directLink.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+        
+        linkContainer.appendChild(directLink);
+        
+        // Voeg de link container toe onder de titel
+        locationItem.appendChild(title);
+        locationItem.appendChild(linkContainer);
+    } else {
+        locationItem.appendChild(title);
+    }
+    
     // Beschrijving
     const description = document.createElement('p');
     description.textContent = point.description || '';
     
-    locationItem.appendChild(title);
     locationItem.appendChild(description);
     
     // Klikgebeurtenisluisteraar
@@ -422,10 +453,27 @@ function highlightLocation(locationItem) {
     if (marker) {
         // Open het infovenster met verbeterde stijl
         const point = reisdata[day].waypoints[index];
+        
+        // Voeg een directe link toe aan de infoWindow als die bestaat
+        let directLinkHtml = '';
+        if (point.directMapLink) {
+            directLinkHtml = `
+                <div style="margin-top: 10px;">
+                    <a href="${point.directMapLink}" target="_blank" style="color: #4285F4; text-decoration: none; display: flex; align-items: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#4285F4" style="margin-right: 5px;">
+                            <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+                        </svg>
+                        Directe link naar locatie
+                    </a>
+                </div>
+            `;
+        }
+        
         const infoContent = `
             <div class="info-window" style="min-width: 250px; padding: 5px;">
                 <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">${point.name}</div>
                 <div style="font-size: 14px;">${point.description || ''}</div>
+                ${directLinkHtml}
             </div>`;
         
         infoWindow.setContent(infoContent);
@@ -508,10 +556,26 @@ function addMarkers(waypoints, color) {
         
         // InfoWindow toevoegen met verbeterde stijl
         marker.addListener('click', () => {
+            // Voeg een directe link toe aan de infoWindow als die bestaat
+            let directLinkHtml = '';
+            if (point.directMapLink) {
+                directLinkHtml = `
+                    <div style="margin-top: 10px;">
+                        <a href="${point.directMapLink}" target="_blank" style="color: #4285F4; text-decoration: none; display: flex; align-items: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#4285F4" style="margin-right: 5px;">
+                                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+                            </svg>
+                            Directe link naar locatie
+                        </a>
+                    </div>
+                `;
+            }
+            
             const infoContent = `
                 <div class="info-window" style="min-width: 250px; padding: 5px;">
                     <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">${point.name}</div>
                     <div style="font-size: 14px;">${point.description || ''}</div>
+                    ${directLinkHtml}
                 </div>`;
             
             infoWindow.setContent(infoContent);

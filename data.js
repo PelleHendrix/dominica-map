@@ -15,7 +15,7 @@ const reisdata = {
             { name: "Douglas-Charles Airport (Melville Hall)", lat: 15.5469, lng: -61.3000, description: "08:00 - Aankomst Dominica + ophalen huurauto" },
             { name: "Kalinago Barana Aute", lat: 15.5024, lng: -61.2609, description: "10:30 - Kalinago Barana Aute (1,5 u incl. reistijd)" },
             { name: "Lunchpauze onderweg", lat: 15.4750, lng: -61.2550, description: "12:30 - Lunchpauze onderweg (1 u)" },
-            { name: "Rosalie Bay", lat: 15.3758, lng: -61.2510, description: "13:30 - Inchecken bij accommodatie + korte rustpauze (30 min)" },
+            { name: "Rosalie Bay (airbnb)", lat: 15.37278, lng: -61.255388, description: "13:30 - Inchecken bij accommodatie + korte rustpauze (30 min)", directMapLink: "https://www.google.com/maps/place/15%C2%B022'22.0%22N+61%C2%B015'19.4%22W/@15.3728088,-61.258013,1107m/data=!3m1!1e3!4m4!3m3!8m2!3d15.37278!4d-61.255388?entry=ttu&g_ep=EgoyMDI1MDQwNi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D" },
             { name: "Emerald Pool", lat: 15.396053, lng: -61.321976, description: "14:30 - Emerald Pool (1,5 u incl. rit + bezoek)" },
             { name: "Rosalie Bay - Schildpadden spotten", lat: 15.3768, lng: -61.2520, description: "20:00 - Schildpadden spotten op het strand (1-1,5 u)" }
         ],
@@ -23,7 +23,7 @@ const reisdata = {
             { lat: 15.5469, lng: -61.3000 }, // Vliegveld
             { lat: 15.5024, lng: -61.2609 }, // Kalinago Barana Aute
             { lat: 15.4750, lng: -61.2550 }, // Lunchpauze
-            { lat: 15.3758, lng: -61.2510 }, // Rosalie Bay
+            { lat: 15.37278, lng: -61.255388 }, // Rosalie Bay
             { lat: 15.396053, lng: -61.321976 }, // Emerald Pool
             { lat: 15.3768, lng: -61.2520 }  // Rosalie Bay - Schildpadden spotten
         ]
@@ -33,7 +33,7 @@ const reisdata = {
         title: "Dag 2: Morne Trois Pitons NP & Spa",
         color: DAY_COLORS.day2,
         waypoints: [
-            { name: "Rosalie Bay", lat: 15.3758, lng: -61.2510, description: "07:30 - Vertrek naar Salton Waterfalls" },
+            { name: "Rosalie Bay", lat: 15.37278, lng: -61.255388, description: "07:30 - Vertrek naar Salton Waterfalls" },
             { name: "Salton Waterfalls", lat: 15.3842194, lng: -61.3578295, description: "08:00 - Salton Waterfalls (1 u incl. bezoek)" },
             { name: "Canefield", lat: 15.3363, lng: -61.3941, description: "09:30 - Check-in bij accommodatie in Canefield (30 min)" },
             { name: "Freshwater Lake", lat: 15.3123, lng: -61.3009, description: "10:30 - Freshwater Lake Hike (1 u)" },
@@ -44,7 +44,7 @@ const reisdata = {
             { name: "Ti Kwen Glo Cho / Tia's Spa", lat: 15.3210, lng: -61.3357, description: "17:30 - Ti Kwen Glo Cho spa (1,5 u ontspannen) en terug naar accommodatie" }
         ],
         route: [
-            { lat: 15.3758, lng: -61.2510 }, // Rosalie Bay
+            { lat: 15.37278, lng: -61.255388 }, // Rosalie Bay
             { lat: 15.3842194, lng: -61.3578295 }, // Salton Waterfalls
             { lat: 15.3363, lng: -61.3941 }, // Canefield
             { lat: 15.3123, lng: -61.3009 }, // Freshwater Lake

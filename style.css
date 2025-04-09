@@ -125,6 +125,27 @@ button .color-dot {
     text-overflow: ellipsis;
 }
 
+.direct-link-container {
+    margin: 5px 0;
+}
+
+.airbnb-direct-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #4285F4;
+    font-size: 0.85rem;
+    padding: 5px;
+    background-color: #f0f7ff;
+    border-radius: 4px;
+    border: 1px solid #d0e0ff;
+    transition: background-color 0.2s;
+}
+
+.airbnb-direct-link:hover {
+    background-color: #e0efff;
+}
+
 .location-item .drive-time {
     font-size: 0.8rem;
     color: #888;
