@@ -9,6 +9,7 @@ let infoWindow;
 let activeLocationItem = null;
 let markerMapping = {}; // Om markers te koppelen aan locatie-items
 let driveTimes = {}; // Om rijtijden tussen locaties op te slaan
+let driveDistances = {}; // Om afstanden tussen locaties op te slaan
 let placesService; // Places API service
 
 // Map initialiseren wanneer het document is geladen
@@ -671,6 +672,7 @@ function drawRoute(waypoints, color, day) {
     
     // Rijtijden opslaan voor deze dag
     driveTimes[day] = [];
+    driveDistances[day] = [];
     
     // Routes per segment berekenen om rijtijden te krijgen
     calculateRouteSegments(waypoints, day, color);
@@ -730,6 +732,7 @@ function calculateRouteSegments(waypoints, day, color) {
 // Bereken rijtijden per segment
 function calculateSegmentTimes(waypoints, day) {
     driveTimes[day] = [];
+    driveDistances[day] = [];
     
     // Voor elk paar opeenvolgende waypoints een route berekenen
     for (let i = 0; i < waypoints.length - 1; i++) {
@@ -750,6 +753,8 @@ function calculateSegmentTimes(waypoints, day) {
                     if (route && route.legs && route.legs[0]) {
                         // Sla de rijtijd op
                         driveTimes[day][index] = route.legs[0].duration.text;
+                        // Sla de afstand op
+                        driveDistances[day][index] = route.legs[0].distance.text;
                         
                         // Update de UI voor dit segment
                         updateDriveTimeUI(day, index);
@@ -766,6 +771,7 @@ function updateDriveTimeUI(day, index) {
     
     const locationItems = document.querySelectorAll(`.location-item[data-day="${day}"]`);
     const driveTime = driveTimes[day][index];
+    const driveDistance = driveDistances[day][index];
     
     // Alleen als we de rijtijd hebben (deze functie kan meerdere keren worden aangeroepen)
     if (driveTime && locationItems[index]) {
@@ -775,10 +781,10 @@ function updateDriveTimeUI(day, index) {
             existingDriveTime.remove();
         }
         
-        // Voeg rijtijd toe aan het huidige item (als indicator naar het volgende punt)
+        // Voeg rijtijd en afstand toe aan het huidige item (als indicator naar het volgende punt)
         const driveTimeElement = document.createElement('div');
         driveTimeElement.className = 'drive-time';
-        driveTimeElement.innerHTML = `<span>→ ${driveTime} rijden naar volgend punt</span>`;
+        driveTimeElement.innerHTML = `<span>→ ${driveTime} (${driveDistance}) naar volgend punt</span>`;
         
         // Alleen toevoegen als het niet het laatste punt is
         if (index < locationItems.length - 1) {
