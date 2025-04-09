@@ -469,11 +469,23 @@ function highlightLocation(locationItem) {
             `;
         }
         
+        // Maak een gecodeerde zoekquery voor Google
+        const searchQuery = encodeURIComponent(`${point.name} dominica`);
+        const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+        
         const infoContent = `
             <div class="info-window" style="min-width: 250px; padding: 5px;">
                 <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">${point.name}</div>
                 <div style="font-size: 14px;">${point.description || ''}</div>
                 ${directLinkHtml}
+                <div style="margin-top: 10px; background-color: #4CAF50; padding: 8px; border-radius: 4px;">
+                    <a href="${googleSearchUrl}" target="_blank" style="color: white; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" style="margin-right: 5px;">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        Zoeken naar ${point.name}
+                    </a>
+                </div>
             </div>`;
         
         infoWindow.setContent(infoContent);
@@ -571,11 +583,23 @@ function addMarkers(waypoints, color) {
                 `;
             }
             
+            // Maak een gecodeerde zoekquery voor Google
+            const searchQuery = encodeURIComponent(`${point.name} dominica`);
+            const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+            
             const infoContent = `
                 <div class="info-window" style="min-width: 250px; padding: 5px;">
                     <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">${point.name}</div>
                     <div style="font-size: 14px;">${point.description || ''}</div>
                     ${directLinkHtml}
+                    <div style="margin-top: 10px; background-color: #4CAF50; padding: 8px; border-radius: 4px;">
+                        <a href="${googleSearchUrl}" target="_blank" style="color: white; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" style="margin-right: 5px;">
+                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                            Zoeken naar ${point.name}
+                        </a>
+                    </div>
                 </div>`;
             
             infoWindow.setContent(infoContent);
