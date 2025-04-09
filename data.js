@@ -13,29 +13,26 @@ const reisdata = {
         color: DAY_COLORS.day1,
         waypoints: [
             { name: "Douglas-Charles Airport (Melville Hall)", lat: 15.5469, lng: -61.3000, description: "08:00 - Aankomst Dominica + ophalen huurauto" },
-            { name: "Kalinago Barana Aute", lat: 15.5024, lng: -61.2609, description: "10:30 - Kalinago Barana Aute (1,5 u incl. reistijd)" },
-            { name: "Lunchpauze onderweg", lat: 15.4750, lng: -61.2550, description: "12:30 - Lunchpauze onderweg (1 u)" },
+            { name: "Kalinago Barana Aute (Tour Boeken)", lat: 15.5024, lng: -61.2609, description: "10:30 - Kalinago Barana Aute (1,5 u incl. reistijd)" },
             { name: "Rosalie Bay (airbnb)", lat: 15.37278, lng: -61.255388, description: "13:30 - Inchecken bij accommodatie + korte rustpauze (30 min)", directMapLink: "https://www.google.com/maps/place/15%C2%B022'22.0%22N+61%C2%B015'19.4%22W/@15.3728088,-61.258013,1107m/data=!3m1!1e3!4m4!3m3!8m2!3d15.37278!4d-61.255388?entry=ttu&g_ep=EgoyMDI1MDQwNi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D" },
             { name: "Emerald Pool", lat: 15.396053, lng: -61.321976, description: "14:30 - Emerald Pool (1,5 u incl. rit + bezoek)" },
-            { name: "Rosalie Bay - Schildpadden spotten", lat: 15.3768, lng: -61.2520, description: "20:00 - Schildpadden spotten op het strand (1-1,5 u)" }
+            { name: "Rosalie Bay - Schildpadden spotten", lat: 15.3768, lng: -61.2520, description: "Beste tijd: 's avonds tussen 19:00–22:30" }
         ],
         route: [
             { lat: 15.5469, lng: -61.3000 }, // Vliegveld
             { lat: 15.5024, lng: -61.2609 }, // Kalinago Barana Aute
-            { lat: 15.4750, lng: -61.2550 }, // Lunchpauze
             { lat: 15.37278, lng: -61.255388 }, // Rosalie Bay
             { lat: 15.396053, lng: -61.321976 }, // Emerald Pool
             { lat: 15.3768, lng: -61.2520 }  // Rosalie Bay - Schildpadden spotten
         ],
-        routeMapLink: "https://www.google.com/maps/dir/Douglas-Charles+Airport,+Dominica/Kalinago+Barana+Aute,+Dominica/15.4750,-61.2550/Rosalie+Bay,+Dominica/Emerald+Pool,+Dominica/Rosalie+Bay,+Dominica/"
+        routeMapLink: "https://www.google.com/maps/dir/Douglas-Charles+Airport,+Dominica/Kalinago+Barana+Aute,+Dominica/Rosalie+Bay,+Dominica/Emerald+Pool,+Dominica/Rosalie+Bay,+Dominica/"
     },
     
     day2: { // 12 April - Vrijdag: Morne Trois Pitons NP & Titou Gorge
         title: "Dag 2: Morne Trois Pitons NP & Titou Gorge",
         color: DAY_COLORS.day2,
         waypoints: [
-            { name: "Rosalie Bay", lat: 15.37278, lng: -61.255388, description: "07:30 - Vertrek naar Salton Waterfalls" },
-            { name: "Salton Waterfalls", lat: 15.3842194, lng: -61.3578295, description: "08:00 - Salton Waterfalls (1 u incl. bezoek)" },
+            { name: "Rosalie Bay", lat: 15.37278, lng: -61.255388, description: "07:30 - Vertrek naar Freshwater Lake" },
             { name: "Freshwater Lake", lat: 15.3123, lng: -61.3009, description: "09:30 - Freshwater Lake Hike (1 u)" },
             { name: "Titou Gorge", lat: 15.3175, lng: -61.3393, description: "11:00 - Titou Gorge (1 u)" },
             { name: "Middleham Falls", lat: 15.3269, lng: -61.3483, description: "12:30 - Middleham Falls (2 u incl. hike en reistijd)" },
@@ -45,7 +42,6 @@ const reisdata = {
         ],
         route: [
             { lat: 15.37278, lng: -61.255388 }, // Rosalie Bay
-            { lat: 15.3842194, lng: -61.3578295 }, // Salton Waterfalls
             { lat: 15.3123, lng: -61.3009 }, // Freshwater Lake
             { lat: 15.3175, lng: -61.3393 }, // Titou Gorge
             { lat: 15.3269, lng: -61.3483 }, // Middleham Falls
@@ -53,7 +49,7 @@ const reisdata = {
             { lat: 15.3210, lng: -61.3357 }, // Ti Kwen Glo Cho spa
             { lat: 15.328927, lng: -61.3881073 } // Canefield
         ],
-        routeMapLink: "https://www.google.com/maps/dir/Rosalie+Bay,+Dominica/Salton+Waterfalls,+Dominica/Freshwater+Lake,+Dominica/Titou+Gorge,+Laudat,+Dominica/Middleham+Falls,+Dominica/Trafalgar+Falls,+Dominica/Ti+Kwen+Glo+Cho,+Wotten+Waven,+Dominica/Canefield,+Dominica/"
+        routeMapLink: "https://www.google.com/maps/dir/Rosalie+Bay,+Dominica/Freshwater+Lake,+Dominica/Titou+Gorge,+Laudat,+Dominica/Middleham+Falls,+Dominica/Trafalgar+Falls,+Dominica/Ti+Kwen+Glo+Cho,+Wotten+Waven,+Dominica/Canefield,+Dominica/"
     },
     
     day3: { // 13 April - Zaterdag: Zuidwestkust & snorkelen
