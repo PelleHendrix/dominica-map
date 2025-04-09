@@ -12,26 +12,56 @@ let driveTimes = {}; // Om rijtijden tussen locaties op te slaan
 let driveDistances = {}; // Om afstanden tussen locaties op te slaan
 let placesService; // Places API service
 
-// Wacht tot de pagina is geladen
-document.addEventListener('DOMContentLoaded', async function() {
-    try {
-        // Controleer of Google Maps API al is geladen
-        if (typeof google === 'undefined') {
-            // Als we in development zijn, laad dan de API key uit .env
-            await loadGoogleMapsFromEnv();
-        } else {
-            // Als Google Maps al is geladen (via GitHub Pages), initialiseer direct
-            initMap();
+// Wacht tot de pagina en Google Maps zijn geladen
+function initializeMap() {
+    // Centrum van Dominica
+    const dominicaCenter = { lat: 15.415, lng: -61.371 };
+    
+    // Map aanmaken
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 10,
+        center: dominicaCenter,
+        mapTypeId: 'terrain',
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
         }
-        setupEventListeners();
-    } catch (error) {
-        console.error("Fout bij het initialiseren van de kaart:", error);
+    });
+    
+    // DirectionsService voor route berekening
+    directionsService = new google.maps.DirectionsService();
+    
+    // PlacesService voor locatie opzoeken
+    placesService = new google.maps.places.PlacesService(map);
+    
+    // InfoWindow voor marker details
+    infoWindow = new google.maps.InfoWindow();
+    
+    // Corrigeer locaties waar nodig
+    correctLocations();
+    
+    // Toon dag 1 standaard
+    showDay(activeDay);
+    
+    // Setup event listeners
+    setupEventListeners();
+}
+
+// Wacht tot de pagina is geladen
+document.addEventListener('DOMContentLoaded', function() {
+    // Controleer of Google Maps API is geladen
+    if (typeof google === 'undefined') {
+        console.error('Google Maps API is niet geladen');
         document.getElementById('map').innerHTML = 
             '<div style="padding: 20px; text-align: center;">' +
-            '<p>Er is een fout opgetreden bij het laden van de Google Maps configuratie.</p>' +
-            '<p>Controleer of je API key correct is geconfigureerd.</p>' +
+            '<p>Er is een fout opgetreden bij het laden van Google Maps.</p>' +
+            '<p>Vernieuw de pagina om het opnieuw te proberen.</p>' +
             '</div>';
+        return;
     }
+    
+    // Initialiseer de kaart
+    initializeMap();
 });
 
 // Functie om het .env bestand te lezen en Google Maps te laden
@@ -91,38 +121,6 @@ function loadGoogleMapsScript(apiKey) {
         // Voeg script toe aan DOM
         document.head.appendChild(script);
     });
-}
-
-// Google Maps initialiseren
-function initMap() {
-    // Centrum van Dominica
-    const dominicaCenter = { lat: 15.415, lng: -61.371 };
-    
-    // Map aanmaken
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 10,
-        center: dominicaCenter,
-        mapTypeId: 'terrain',
-        mapTypeControl: true,
-        mapTypeControlOptions: {
-            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
-        }
-    });
-    
-    // DirectionsService voor route berekening
-    directionsService = new google.maps.DirectionsService();
-    
-    // PlacesService voor locatie opzoeken
-    placesService = new google.maps.places.PlacesService(map);
-    
-    // InfoWindow voor marker details
-    infoWindow = new google.maps.InfoWindow();
-    
-    // Corrigeer locaties waar nodig
-    correctLocations();
-    
-    // Toon dag 1 standaard
-    showDay(activeDay);
 }
 
 // Corrigeer locaties met behulp van Places API
