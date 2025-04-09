@@ -58,7 +58,9 @@ async function getEnvConfig() {
 
 // Functie om de gebruiker om een API-sleutel te vragen
 function promptForApiKey() {
-    const userApiKey = prompt(
+    // Een duidelijkere prompt die altijd verschijnt
+    const userApiKey = window.prompt(
+        "Google Maps API-sleutel invoeren\n\n" +
         "Voor het eerste gebruik: voer je Google Maps API-sleutel in.\n" +
         "Deze wordt lokaal opgeslagen in je browser voor toekomstig gebruik.\n" +
         "Je hoeft dit slechts één keer te doen."
@@ -67,10 +69,16 @@ function promptForApiKey() {
     if (userApiKey && userApiKey.trim() !== "") {
         // Sla de sleutel op in localStorage voor langdurig gebruik
         localStorage.setItem('GOOGLE_MAPS_API_KEY', userApiKey.trim());
+        console.log("API-sleutel succesvol opgeslagen");
         return { GOOGLE_MAPS_API_KEY: userApiKey.trim() };
     } else {
         // Fallback als de gebruiker geen sleutel invoert
-        alert("Een API-sleutel is vereist om de kaart te bekijken. Vernieuw de pagina om het opnieuw te proberen.");
+        console.error("Geen API-sleutel ingevoerd!");
+        // Probeer het nogmaals na een korte vertraging
+        setTimeout(() => {
+            alert("Een API-sleutel is vereist om de kaart te bekijken. De pagina wordt vernieuwd om het opnieuw te proberen.");
+            window.location.reload();
+        }, 500);
         return { GOOGLE_MAPS_API_KEY: "" };
     }
 }

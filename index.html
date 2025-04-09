@@ -2,65 +2,207 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#4CAF50">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Dominica Reisroute 11-14 April</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reisplanning Dominica – 11 t/m 14 april</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Maps script wordt dynamisch geladen in script.js -->
-    <script src="data.js" defer></script>
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Open Graph tags voor betere social sharing -->
+    <meta property="og:title" content="Reisplanning Dominica">
+    <meta property="og:description" content="Interactieve kaart en reisplanner voor Dominica">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1650668300370-85484170f5ba">
+    <meta property="og:url" content="https://pellehendrix.github.io/dominica-map/">
+    
+    <!-- Voeg een instructiemelding toe die altijd zichtbaar is bij het laden -->
+    <style>
+        #api-key-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        #api-key-overlay h2 {
+            margin-bottom: 20px;
+        }
+        #api-key-overlay p {
+            margin-bottom: 15px;
+            max-width: 600px;
+            line-height: 1.5;
+        }
+        #api-key-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #api-key-input {
+            padding: 10px;
+            width: 300px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 4px;
+        }
+        #api-key-submit {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #api-key-submit:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <!-- API Key overlay -->
+    <div id="api-key-overlay">
+        <h2>Google Maps API-sleutel nodig</h2>
+        <p>Om de kaart te bekijken heb je een Google Maps API-sleutel nodig. Deze wordt veilig opgeslagen in je browser en wordt niet gedeeld.</p>
+        <p>Je hoeft deze sleutel slechts één keer in te voeren. De sleutel blijft opgeslagen in je browser voor toekomstig gebruik.</p>
+        <form id="api-key-form">
+            <input type="text" id="api-key-input" placeholder="Voer je Google Maps API-sleutel in" />
+            <button type="submit" id="api-key-submit">Opslaan en doorgaan</button>
+        </form>
+    </div>
+
+    <header>
         <h1>Reisplanning Dominica – 11 t/m 14 april</h1>
-        <div class="controls">
-            <button id="day1" class="active"><span class="color-dot day1"></span> Dag 1: Oostkust & Kalinago-territorium</button>
-            <button id="day2"><span class="color-dot day2"></span> Dag 2: Morne Trois Pitons NP</button>
-            <button id="day3"><span class="color-dot day3"></span> Dag 3: Zuidwestkust & snorkelen</button>
-            <button id="day4"><span class="color-dot day4"></span> Dag 4: Noordkust & Indian River</button>
-            <button id="all-days">Alle dagen</button>
+    </header>
+    
+    <div class="controls">
+        <button id="day1" class="active">
+            <span class="color-dot" style="background-color: #FF5252;"></span>
+            Dag 1: Oostkust & Kalinago-territorium
+        </button>
+        <button id="day2">
+            <span class="color-dot" style="background-color: #536DFE;"></span>
+            Dag 2: Morne Trois Pitons NP
+        </button>
+        <button id="day3">
+            <span class="color-dot" style="background-color: #FFA000;"></span>
+            Dag 3: Zuidwestkust & snorkelen
+        </button>
+        <button id="day4">
+            <span class="color-dot" style="background-color: #4CAF50;"></span>
+            Dag 4: Noordkust & Indian River
+        </button>
+        <button id="all-days">
+            <span class="color-dot" style="background-color: #9C27B0;"></span>
+            Alle dagen
+        </button>
+    </div>
+    
+    <div class="container">
+        <div class="left-sidebar">
+            <h2>Locaties</h2>
+            <div id="locations-list"></div>
         </div>
+        
         <div class="map-container">
-            <div class="locations-panel">
-                <h2>Locaties</h2>
-                <div id="locations-list" class="locations-list">
-                    <!-- Locaties worden hier dynamisch ingevuld vanuit JavaScript -->
-                </div>
+            <div class="map-controls">
+                <button id="zoom-out-button" title="Zoom uit om heel Dominica te zien">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button id="fullscreen-button" title="Volledig scherm">
+                    <i class="fas fa-expand"></i>
+                </button>
             </div>
             <div id="map"></div>
         </div>
-        
-        <!-- Legenda voor activiteitstypes -->
-        <div class="activity-legend">
-            <h3>Legenda Activiteiten</h3>
-            <div class="legend-items">
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #00BCD4;"></span>
-                    <span class="legend-label">Zwemmen/Snorkelen</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #8BC34A;"></span>
-                    <span class="legend-label">Wandelen/Hiken</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #9C27B0;"></span>
-                    <span class="legend-label">Cultuur/Historisch</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #4CAF50;"></span>
-                    <span class="legend-label">Natuur/Uitzicht</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #FF9800;"></span>
-                    <span class="legend-label">Relaxen/Strand</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color" style="background-color: #607D8B;"></span>
-                    <span class="legend-label">Vervoer/Transport</span>
-                </div>
+    </div>
+    
+    <footer>
+        <h3>Legenda Activiteiten</h3>
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #00BCD4;"></span>
+                <span>Zwemmen/Snorkelen</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #8BC34A;"></span>
+                <span>Wandelen/Hiken</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #9C27B0;"></span>
+                <span>Cultuur/Historisch</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #4CAF50;"></span>
+                <span>Natuur/Uitzicht</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #FF9800;"></span>
+                <span>Relaxen/Strand</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background-color: #607D8B;"></span>
+                <span>Vervoer/Transport</span>
             </div>
         </div>
-    </div>
+    </footer>
+    
+    <!-- Activity colors -->
+    <script>
+        const ACTIVITY_COLORS = {
+            "zwemmen": "#00BCD4",
+            "wandelen": "#8BC34A",
+            "cultuur": "#9C27B0",
+            "natuur": "#4CAF50",
+            "relaxen": "#FF9800",
+            "vervoer": "#607D8B"
+        };
+    </script>
+    
+    <!-- Reis data -->
+    <script src="data.js"></script>
+    
+    <!-- Main script -->
+    <script src="script.js"></script>
+
+    <!-- Script voor API-key overlay -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check of de API-sleutel al is opgeslagen
+            const savedKey = localStorage.getItem('GOOGLE_MAPS_API_KEY');
+            
+            // Toon of verberg de overlay op basis van of de sleutel is opgeslagen
+            const overlay = document.getElementById('api-key-overlay');
+            if (savedKey) {
+                overlay.style.display = 'none';
+            }
+            
+            // Verwerk het formulier
+            document.getElementById('api-key-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const apiKeyInput = document.getElementById('api-key-input');
+                const apiKey = apiKeyInput.value.trim();
+                
+                if (apiKey) {
+                    // Sla de API-sleutel op in localStorage
+                    localStorage.setItem('GOOGLE_MAPS_API_KEY', apiKey);
+                    
+                    // Verberg de overlay
+                    overlay.style.display = 'none';
+                    
+                    // Pagina vernieuwen om de kaart te laden met de nieuwe sleutel
+                    window.location.reload();
+                } else {
+                    alert("Voer een geldige API-sleutel in");
+                }
+            });
+        });
+    </script>
 </body>
 </html> 
