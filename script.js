@@ -12,92 +12,66 @@ let driveTimes = {}; // Om rijtijden tussen locaties op te slaan
 let driveDistances = {}; // Om afstanden tussen locaties op te slaan
 let placesService; // Places API service
 
-// Wacht tot de pagina is geladen
-document.addEventListener('DOMContentLoaded', function() {
-    // Wacht tot Google Maps API is geladen
-    if (window.google && window.google.maps) {
-        initializeMap();
-    } else {
-        // Als de API nog niet is geladen, wacht op het load event
-        window.initMap = initializeMap;
+// Functie om de API-sleutel veilig te laden
+async function getEnvConfig() {
+    // Check eerst of we de API-sleutel hebben in localStorage
+    const savedKey = localStorage.getItem('GOOGLE_MAPS_API_KEY');
+    
+    // Als we een opgeslagen sleutel hebben en we zijn niet in lokale ontwikkeling, gebruik deze
+    if (savedKey && !window.location.href.includes('127.0.0.1') && !window.location.href.includes('localhost')) {
+        console.log("API-sleutel gevonden in lokale opslag");
+        return { GOOGLE_MAPS_API_KEY: savedKey };
     }
-});
-
-// Initialiseer de kaart
-function initializeMap() {
-    try {
-        // Centrum van Dominica
-        const dominicaCenter = { lat: 15.415, lng: -61.371 };
-        
-        // Map aanmaken
-        map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 10,
-            center: dominicaCenter,
-            mapTypeId: 'terrain',
-            mapTypeControl: true,
-            mapTypeControlOptions: {
-                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+    
+    // Lokale ontwikkeling: probeer het .env bestand te laden
+    if (window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost')) {
+        try {
+            const response = await fetch('.env');
+            const text = await response.text();
+            
+            // Eenvoudige parser voor .env bestand
+            const config = {};
+            text.split('\n').forEach(line => {
+                // Negeer commentaarregels en lege regels
+                if (line.startsWith('#') || line.trim() === '') return;
+                
+                const [key, value] = line.split('=');
+                if (key && value) {
+                    config[key.trim()] = value.trim();
+                }
+            });
+            
+            // Sla de sleutel op voor toekomstig gebruik
+            if (config.GOOGLE_MAPS_API_KEY) {
+                localStorage.setItem('GOOGLE_MAPS_API_KEY', config.GOOGLE_MAPS_API_KEY);
             }
-        });
-        
-        // DirectionsService voor route berekening
-        directionsService = new google.maps.DirectionsService();
-        
-        // PlacesService voor locatie opzoeken
-        placesService = new google.maps.places.PlacesService(map);
-        
-        // InfoWindow voor marker details
-        infoWindow = new google.maps.InfoWindow();
-        
-        // Corrigeer locaties waar nodig
-        correctLocations();
-        
-        // Toon dag 1 standaard
-        showDay(activeDay);
-        
-        // Setup event listeners
-        setupEventListeners();
-    } catch (error) {
-        console.error('Fout bij initialiseren van de kaart:', error);
-        document.getElementById('map').innerHTML = 
-            '<div style="padding: 20px; text-align: center;">' +
-            '<p>Er is een fout opgetreden bij het laden van de kaart.</p>' +
-            '<p>Controleer of je internetverbinding werkt en vernieuw de pagina.</p>' +
-            '</div>';
+            
+            return config;
+        } catch (error) {
+            console.error("Kan het .env bestand niet laden:", error);
+        }
     }
+    
+    // Als we hier komen, hebben we geen sleutel gevonden. Vraag de gebruiker
+    return promptForApiKey();
 }
 
-// Functie om het .env bestand te lezen en Google Maps te laden
-async function loadGoogleMapsFromEnv() {
-    try {
-        const response = await fetch('/.env');
-        const text = await response.text();
-        
-        // Eenvoudige parser voor .env bestand
-        const config = {};
-        text.split('\n').forEach(line => {
-            if (line.startsWith('#') || line.trim() === '') return;
-            const [key, value] = line.split('=');
-            if (key && value) {
-                config[key.trim()] = value.trim();
-            }
-        });
-        
-        // Laad Google Maps alleen als het nog niet geladen is
-        if (typeof google === 'undefined') {
-            await loadGoogleMapsScript(config.GOOGLE_MAPS_API_KEY);
-        }
-        
-        // Initialiseer de kaart
-        initMap();
-    } catch (error) {
-        console.error("Kan het .env bestand niet laden:", error);
-        document.getElementById('map').innerHTML = 
-            '<div style="padding: 20px; text-align: center;">' +
-            '<p>Er is een fout opgetreden bij het laden van de Google Maps configuratie.</p>' +
-            '<p>Zorg ervoor dat je een geldig .env bestand hebt met je Google Maps API key.</p>' +
-            '</div>';
-        throw new Error('Google Maps API key niet gevonden');
+// Functie om de gebruiker om een API-sleutel te vragen
+function promptForApiKey() {
+    const userApiKey = prompt(
+        "Voor het eerste gebruik: voer je Google Maps API-sleutel in.\n" +
+        "Deze wordt lokaal opgeslagen in je browser voor toekomstig gebruik.\n" +
+        "Je hoeft dit slechts één keer te doen."
+    );
+    
+    if (userApiKey && userApiKey.trim() !== "") {
+        // Sla de sleutel op in localStorage voor langdurig gebruik
+        localStorage.setItem('GOOGLE_MAPS_API_KEY', userApiKey.trim());
+        return { GOOGLE_MAPS_API_KEY: userApiKey.trim() };
+    } else {
+        // Fallback als de gebruiker geen sleutel invoert
+        alert("Een API-sleutel is vereist om de kaart te bekijken. Vernieuw de pagina om het opnieuw te proberen.");
+        return { GOOGLE_MAPS_API_KEY: "" };
     }
 }
 
@@ -124,6 +98,68 @@ function loadGoogleMapsScript(apiKey) {
         // Voeg script toe aan DOM
         document.head.appendChild(script);
     });
+}
+
+// Start de applicatie
+async function startApp() {
+    try {
+        // Haal de configuratie op uit het .env bestand
+        const config = await getEnvConfig();
+        
+        // Haal de API-sleutel uit de configuratie
+        const apiKey = config.GOOGLE_MAPS_API_KEY;
+        await loadGoogleMapsScript(apiKey);
+        
+        // Initialiseer de kaart na het laden van de API
+        initMap();
+        setupEventListeners();
+        
+        // Voeg een functie toe om de huidige infoWindow te sluiten
+        window.closeCurrentInfoWindow = function() {
+            if (infoWindow) {
+                infoWindow.close();
+            }
+        };
+    } catch (error) {
+        console.error("Fout bij het starten van de applicatie:", error);
+        document.getElementById('map').innerHTML = 
+            '<div style="padding: 20px; text-align: center;">Er is een fout opgetreden bij het laden van de kaart. Probeer de pagina te vernieuwen.</div>';
+    }
+}
+
+// Start de app wanneer het document is geladen
+document.addEventListener('DOMContentLoaded', startApp);
+
+// Google Maps initialiseren
+function initMap() {
+    // Centrum van Dominica
+    const dominicaCenter = { lat: 15.415, lng: -61.371 };
+    
+    // Map aanmaken
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 10,
+        center: dominicaCenter,
+        mapTypeId: 'terrain',
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+        }
+    });
+    
+    // DirectionsService voor route berekening
+    directionsService = new google.maps.DirectionsService();
+    
+    // PlacesService voor locatie opzoeken
+    placesService = new google.maps.places.PlacesService(map);
+    
+    // InfoWindow voor marker details
+    infoWindow = new google.maps.InfoWindow();
+    
+    // Corrigeer locaties waar nodig
+    correctLocations();
+    
+    // Toon dag 1 standaard
+    showDay(activeDay);
 }
 
 // Corrigeer locaties met behulp van Places API

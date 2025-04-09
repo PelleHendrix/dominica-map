@@ -1,12 +1,53 @@
-# Dominica Reisroute App
+# Reisplanning Dominica
 
-Een interactieve kaart-applicatie voor het plannen van een reis naar Dominica.
+Een interactieve kaart voor het plannen van een reis naar Dominica.
 
 ## Functies
-- Interactieve Google Maps integratie
-- Dagindeling van activiteiten
-- Gedetailleerde informatie over locaties
-- Responsief ontwerp voor desktop, tablet en mobiel gebruik
+
+- Interactieve Google Maps-kaart van Dominica
+- Dagplanning met verschillende locaties
+- Details over elke bestemming
+- Route-informatie en rijtijden tussen locaties
+
+## Installatie en gebruik
+
+### Lokaal gebruik
+1. Clone deze repository
+2. Maak een `.env` bestand aan in de hoofdmap met de volgende inhoud:
+   ```
+   GOOGLE_MAPS_API_KEY=jouw_google_maps_api_sleutel
+   ```
+3. Open het project met een lokale server, bijvoorbeeld:
+   ```
+   npx http-server
+   ```
+4. Ga naar `http://localhost:8080` in je browser
+
+### Online gebruik (GitHub Pages)
+De applicatie vraagt bij het eerste gebruik om je Google Maps API-sleutel. Deze wordt veilig opgeslagen in de lokale opslag van je browser en wordt nooit gedeeld met de server of opgeslagen in de code.
+
+**Belangrijk**: Je moet een geldige Google Maps API-sleutel hebben met de volgende API's ingeschakeld:
+- Maps JavaScript API
+- Places API
+- Directions API
+
+## API-sleutel veiligheid
+
+Voor de veiligheid van je API-sleutel:
+1. Beperk je API-sleutel in de Google Cloud Console tot specifieke websites/domeinen
+2. Stel quotalimieten in voor je API-gebruik
+3. Controleer regelmatig je API-gebruik in de Google Cloud Console
+
+## Ontwikkelaarsnotities
+
+- Het `.env` bestand is toegevoegd aan `.gitignore` en wordt nooit geüpload naar GitHub
+- De API-sleutel wordt veilig opgeslagen in de localStorage van de browser voor hergebruik
+- Voor lokale ontwikkeling wordt het `.env` bestand gebruikt
+- Voor GitHub Pages wordt de API-sleutel uit localStorage gehaald of aan de gebruiker gevraagd
+
+## Disclaimer
+
+Dit is een persoonlijk project voor reisplanning. Gebruik de kaart en routebeschrijvingen als richtlijn, maar controleer altijd de actuele informatie voordat je op reis gaat.
 
 ## Mobiel gebruik
 Deze applicatie is volledig geoptimaliseerd voor gebruik op mobiele apparaten. Je kunt het op de volgende manieren mobiel gebruiken:
@@ -18,8 +59,7 @@ Deze applicatie is volledig geoptimaliseerd voor gebruik op mobiele apparaten. J
 Om de applicatie lokaal te draaien:
 
 1. Clone de repository
-2. Volg de Google Maps API configuratie stappen hierboven
-3. Open `index.html` in een webbrowser
+2. Open index.html in een webbrowser
 
 ## GitHub Pages
 Deze applicatie is ook beschikbaar via GitHub Pages op:
@@ -38,27 +78,19 @@ Deze applicatie is ook beschikbaar via GitHub Pages op:
 1. Download of kloon deze repository naar je computer
 2. Open `index.html` in je webbrowser
 
-## Google Maps API Configuratie
+## Google Maps API Key
 
-Om de kaart correct te laten werken, moet je een Google Maps API key instellen:
+**Belangrijk**: Om de kaart correct te laten werken moet je je eigen Google Maps API key invoeren:
 
 1. Ga naar de [Google Cloud Console](https://console.cloud.google.com/)
-2. Maak een nieuw project aan of selecteer een bestaand project
-3. Activeer de volgende API's voor je project:
-   - Maps JavaScript API
-   - Directions API
-   - Places API
-4. Maak een nieuwe API key aan:
-   - Ga naar "Credentials"
-   - Klik op "Create Credentials" > "API Key"
-5. Beveilig je API key:
-   - Beperk de key tot alleen HTTP-referrers van jouw domein
-   - Beperk de API's tot alleen de benodigde services
-6. Kopieer het `.env.example` bestand naar `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-7. Open het `.env` bestand en vervang `jouw_api_key_hier` met je eigen API key
+2. Maak een project aan of selecteer een bestaand project
+3. Activeer de "Maps JavaScript API" en "Directions API"
+4. Maak een API-sleutel aan
+5. Open `index.html` en vervang `YOUR_API_KEY` met je eigen API-sleutel
+
+```html
+<script src="https://maps.googleapis.com/maps/api/js?key=JOUW_API_SLEUTEL" defer></script>
+```
 
 ## Aanpassen van de reisgegevens
 
@@ -80,48 +112,8 @@ Als de routes niet correct worden weergegeven:
 
 Ontwikkeld voor een 4-daagse reis naar Dominica. Gebruik voor persoonlijke doeleinden.
 
-## Installatie
-
-1. Clone de repository:
-   ```
-   git clone <repository-url>
-   cd dominica-map
-   ```
-
-2. Maak een `.env` bestand aan in de hoofdmap met uw Google Maps API sleutel:
-   ```
-   # .env bestand
-   GOOGLE_MAPS_API_KEY=jouw_google_maps_api_sleutel_hier
-   ```
-
-   > **Let op**: Het `.env` bestand wordt niet meegenomen in Git voor veiligheidsredenen. Zorg ervoor dat je je API-sleutel niet deelt of publiceert.
-
-3. Open `index.html` in een webbrowser.
-
-## Functies
-
-- Interactieve kaart met reisroutes per dag
-- Gedetailleerde locatie-informatie met reistijden en afstanden
-- Kleurgecodeerde activiteiten
-- Responsive ontwerp voor verschillende schermformaten
-
 ## Ontwikkeling
 
 ### Projectstructuur
 - `index.html` - Hoofdpagina
-- `style.css` - Stijlen
-- `script.js` - JavaScript code
-- `data.js` - Reisdata en configuratie
-- `.env` - Omgevingsbestand voor gevoelige informatie (niet in Git)
-
-### API sleutel instellen
-Om de Google Maps API te gebruiken, moet je je eigen API-sleutel instellen in het `.env` bestand:
-
-1. Maak een Google Cloud Platform account aan
-2. Maak een project en activeer de Maps JavaScript API
-3. Maak een API sleutel 
-4. Voeg de sleutel toe aan je `.env` bestand
-
-## Licentie
-
-Dit project is beschikbaar onder de MIT-licentie. 
+- `
