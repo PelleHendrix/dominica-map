@@ -233,8 +233,23 @@ function showAllDays() {
         }
     });
     
-    // Zoom om alle routes te tonen
-    zoomToFit(allWaypoints);
+    // Zoom om heel Dominica te tonen in plaats van alleen de routes
+    zoomToDominica();
+}
+
+// Zoom aanpassen om heel Dominica in beeld te brengen
+function zoomToDominica() {
+    // Definieer de bounds van Dominica met extra ruimte
+    const dominicaBounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(15.10, -61.55), // Zuidwest (verruimd)
+        new google.maps.LatLng(15.70, -61.20) // Noordoost (verruimd)
+    );
+    
+    // Pas de kaart aan om Dominica te tonen
+    map.fitBounds(dominicaBounds);
+    
+    // Voeg een kleine padding toe voor betere visualisatie
+    map.fitBounds(dominicaBounds, { top: 30, right: 30, bottom: 30, left: 30 });
 }
 
 // Vul de locatielijst voor één dag
@@ -262,6 +277,26 @@ function populateLocationsList(day) {
     headerElement.appendChild(document.createTextNode(data.title));
     
     groupElement.appendChild(headerElement);
+    
+    // Google Maps-knop toevoegen
+    const googleMapsButton = document.createElement('button');
+    googleMapsButton.className = 'google-maps-button';
+    googleMapsButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" style="margin-right: 8px;">
+            <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+        </svg>
+        Open in Google Maps`;
+    googleMapsButton.addEventListener('click', function(event) {
+        event.stopPropagation(); // Voorkom dat de klik doorgaat naar de parent elementen
+        openInGoogleMaps(day);
+    });
+    
+    // Container voor de Google Maps-knop
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'google-maps-button-container';
+    buttonContainer.appendChild(googleMapsButton);
+    
+    groupElement.appendChild(buttonContainer);
     
     // Voeg alle locaties toe
     data.waypoints.forEach((point, index) => {
@@ -308,6 +343,26 @@ function populateLocationsListAllDays() {
         headerElement.appendChild(document.createTextNode(data.title));
         
         groupElement.appendChild(headerElement);
+        
+        // Google Maps-knop toevoegen
+        const googleMapsButton = document.createElement('button');
+        googleMapsButton.className = 'google-maps-button';
+        googleMapsButton.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" style="margin-right: 8px;">
+                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+            </svg>
+            Open in Google Maps`;
+        googleMapsButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // Voorkom dat de klik doorgaat naar de parent elementen
+            openInGoogleMaps(day);
+        });
+        
+        // Container voor de Google Maps-knop
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'google-maps-button-container';
+        buttonContainer.appendChild(googleMapsButton);
+        
+        groupElement.appendChild(buttonContainer);
         
         // Voeg alle locaties toe
         data.waypoints.forEach((point, index) => {
@@ -658,4 +713,37 @@ function zoomToFit(waypoints) {
     if (waypoints.length === 1) {
         map.setZoom(11);
     }
+}
+
+// Functie om een route in Google Maps te openen
+function openInGoogleMaps(day) {
+    const waypoints = reisdata[day].waypoints;
+    if (!waypoints || waypoints.length < 2) return;
+    
+    // Start- en eindpunt
+    const origin = `${waypoints[0].lat},${waypoints[0].lng}`;
+    const destination = `${waypoints[waypoints.length - 1].lat},${waypoints[waypoints.length - 1].lng}`;
+    
+    // Tussenpunten (maximaal 8 extra stops in Google Maps URL)
+    let waypointsStr = '';
+    // Google Maps ondersteunt max. 10 punten inclusief origin en destination
+    // We selecteren strategisch verdeelde punten als er meer dan 8 tussenstops zijn
+    if (waypoints.length > 2) {
+        const maxStops = Math.min(8, waypoints.length - 2);
+        const interval = (waypoints.length - 2) / maxStops;
+        
+        const selectedWaypoints = [];
+        for (let i = 0; i < maxStops; i++) {
+            const index = Math.min(1 + Math.floor(i * interval), waypoints.length - 2);
+            selectedWaypoints.push(`${waypoints[index].lat},${waypoints[index].lng}`);
+        }
+        
+        waypointsStr = '&waypoints=' + selectedWaypoints.join('|');
+    }
+    
+    // Bouw de Google Maps URL
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypointsStr}&travelmode=driving`;
+    
+    // Open in nieuw tabblad
+    window.open(url, '_blank');
 } 
