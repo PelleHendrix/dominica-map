@@ -12,8 +12,30 @@ let driveTimes = {}; // Om rijtijden tussen locaties op te slaan
 let driveDistances = {}; // Om afstanden tussen locaties op te slaan
 let placesService; // Places API service
 
-// Functie om het .env bestand te lezen
-async function getEnvConfig() {
+// Wacht tot de pagina is geladen
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Controleer of Google Maps API al is geladen
+        if (typeof google === 'undefined') {
+            // Als we in development zijn, laad dan de API key uit .env
+            await loadGoogleMapsFromEnv();
+        } else {
+            // Als Google Maps al is geladen (via GitHub Pages), initialiseer direct
+            initMap();
+        }
+        setupEventListeners();
+    } catch (error) {
+        console.error("Fout bij het initialiseren van de kaart:", error);
+        document.getElementById('map').innerHTML = 
+            '<div style="padding: 20px; text-align: center;">' +
+            '<p>Er is een fout opgetreden bij het laden van de Google Maps configuratie.</p>' +
+            '<p>Controleer of je API key correct is geconfigureerd.</p>' +
+            '</div>';
+    }
+});
+
+// Functie om het .env bestand te lezen en Google Maps te laden
+async function loadGoogleMapsFromEnv() {
     try {
         const response = await fetch('/.env');
         const text = await response.text();
@@ -21,20 +43,28 @@ async function getEnvConfig() {
         // Eenvoudige parser voor .env bestand
         const config = {};
         text.split('\n').forEach(line => {
-            // Negeer commentaarregels en lege regels
             if (line.startsWith('#') || line.trim() === '') return;
-            
             const [key, value] = line.split('=');
             if (key && value) {
                 config[key.trim()] = value.trim();
             }
         });
         
-        return config;
+        // Laad Google Maps alleen als het nog niet geladen is
+        if (typeof google === 'undefined') {
+            await loadGoogleMapsScript(config.GOOGLE_MAPS_API_KEY);
+        }
+        
+        // Initialiseer de kaart
+        initMap();
     } catch (error) {
         console.error("Kan het .env bestand niet laden:", error);
-        // Fallback naar hardcoded sleutel (niet ideaal, maar werkt als fallback)
-        return { GOOGLE_MAPS_API_KEY: 'AIzaSyBvIMHAf3ole4qp-0OcDOGScYNa6M_OA8A' };
+        document.getElementById('map').innerHTML = 
+            '<div style="padding: 20px; text-align: center;">' +
+            '<p>Er is een fout opgetreden bij het laden van de Google Maps configuratie.</p>' +
+            '<p>Zorg ervoor dat je een geldig .env bestand hebt met je Google Maps API key.</p>' +
+            '</div>';
+        throw new Error('Google Maps API key niet gevonden');
     }
 }
 
@@ -62,35 +92,6 @@ function loadGoogleMapsScript(apiKey) {
         document.head.appendChild(script);
     });
 }
-
-// Start de applicatie
-async function startApp() {
-    try {
-        // Haal de configuratie op uit het .env bestand
-        const config = await getEnvConfig();
-        
-        // Laad de Google Maps API
-        await loadGoogleMapsScript(config.GOOGLE_MAPS_API_KEY);
-        
-        // Initialiseer de kaart na het laden van de API
-        initMap();
-        setupEventListeners();
-        
-        // Voeg een functie toe om de huidige infoWindow te sluiten
-        window.closeCurrentInfoWindow = function() {
-            if (infoWindow) {
-                infoWindow.close();
-            }
-        };
-    } catch (error) {
-        console.error("Fout bij het starten van de applicatie:", error);
-        document.getElementById('map').innerHTML = 
-            '<div style="padding: 20px; text-align: center;">Er is een fout opgetreden bij het laden van de kaart. Probeer de pagina te vernieuwen.</div>';
-    }
-}
-
-// Start de app wanneer het document is geladen
-document.addEventListener('DOMContentLoaded', startApp);
 
 // Google Maps initialiseren
 function initMap() {

@@ -1,0 +1,34 @@
+name: Deploy naar GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # of 'master' als dat je hoofdbranch is
+  workflow_dispatch:  # Staat handmatige triggers toe
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      # Maak .env bestand aan met de API key
+      - name: Maak .env bestand
+        run: |
+          echo "GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}" > .env
+          
+      # Bouw de site
+      - name: Vervang API key in script.js
+        run: |
+          API_KEY=$(grep GOOGLE_MAPS_API_KEY .env | cut -d '=' -f2)
+          # Voeg de API key toe aan de script tag in index.html
+          sed -i "s|<!-- Google Maps script wordt dynamisch geladen in script.js -->|<script src=\"https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places\" defer></script>|g" index.html
+          
+      # Deploy naar GitHub Pages
+      - name: Deploy naar GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          # Zorg ervoor dat we het .env bestand niet publiceren
+          exclude_assets: '.env' 

@@ -18,7 +18,8 @@ Deze applicatie is volledig geoptimaliseerd voor gebruik op mobiele apparaten. J
 Om de applicatie lokaal te draaien:
 
 1. Clone de repository
-2. Open index.html in een webbrowser
+2. Volg de Google Maps API configuratie stappen hierboven
+3. Open `index.html` in een webbrowser
 
 ## GitHub Pages
 Deze applicatie is ook beschikbaar via GitHub Pages op:
@@ -37,19 +38,27 @@ Deze applicatie is ook beschikbaar via GitHub Pages op:
 1. Download of kloon deze repository naar je computer
 2. Open `index.html` in je webbrowser
 
-## Google Maps API Key
+## Google Maps API Configuratie
 
-**Belangrijk**: Om de kaart correct te laten werken moet je je eigen Google Maps API key invoeren:
+Om de kaart correct te laten werken, moet je een Google Maps API key instellen:
 
 1. Ga naar de [Google Cloud Console](https://console.cloud.google.com/)
-2. Maak een project aan of selecteer een bestaand project
-3. Activeer de "Maps JavaScript API" en "Directions API"
-4. Maak een API-sleutel aan
-5. Open `index.html` en vervang `YOUR_API_KEY` met je eigen API-sleutel
-
-```html
-<script src="https://maps.googleapis.com/maps/api/js?key=JOUW_API_SLEUTEL" defer></script>
-```
+2. Maak een nieuw project aan of selecteer een bestaand project
+3. Activeer de volgende API's voor je project:
+   - Maps JavaScript API
+   - Directions API
+   - Places API
+4. Maak een nieuwe API key aan:
+   - Ga naar "Credentials"
+   - Klik op "Create Credentials" > "API Key"
+5. Beveilig je API key:
+   - Beperk de key tot alleen HTTP-referrers van jouw domein
+   - Beperk de API's tot alleen de benodigde services
+6. Kopieer het `.env.example` bestand naar `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+7. Open het `.env` bestand en vervang `jouw_api_key_hier` met je eigen API key
 
 ## Aanpassen van de reisgegevens
 
