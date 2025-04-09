@@ -15,7 +15,7 @@ const reisdata = {
             { name: "Douglas-Charles Airport (Melville Hall)", lat: 15.5469, lng: -61.3000, description: "08:00 - Aankomst Dominica + ophalen huurauto" },
             { name: "Kalinago Barana Aute (Tour Boeken)", lat: 15.5024, lng: -61.2609, description: "10:30 - Kalinago Barana Aute (1,5 u incl. reistijd)" },
             { name: "Rosalie Bay (airbnb)", lat: 15.37278, lng: -61.255388, description: "13:30 - Inchecken bij accommodatie + korte rustpauze (30 min)", directMapLink: "https://www.google.com/maps/place/15%C2%B022'22.0%22N+61%C2%B015'19.4%22W/@15.3728088,-61.258013,1107m/data=!3m1!1e3!4m4!3m3!8m2!3d15.37278!4d-61.255388?entry=ttu&g_ep=EgoyMDI1MDQwNi4wIKXMDSoJLDEwMjExNDU1SAFQAw%3D%3D" },
-            { name: "Emerald Pool", lat: 15.396053, lng: -61.321976, description: "14:30 - Emerald Pool (1,5 u incl. rit + bezoek)" },
+            { name: "Emerald Pool (Koop een weekpass)", lat: 15.396053, lng: -61.321976, description: "14:30 - Emerald Pool (1,5 u incl. rit + bezoek)" },
             { name: "Rosalie Bay - Schildpadden spotten", lat: 15.3768, lng: -61.2520, description: "Beste tijd: 's avonds tussen 19:00–22:30" }
         ],
         route: [
@@ -60,18 +60,16 @@ const reisdata = {
             { name: "Champagne Reef", lat: 15.2608, lng: -61.3731, description: "08:30 - Snorkelen bij Champagne Reef (1,5 u)" },
             { name: "Roseau", lat: 15.3017, lng: -61.3881, description: "10:30 - Lunch in Roseau (1 u)" },
             { name: "Old Market", lat: 15.2984, lng: -61.3871, description: "11:30 - Bezoek de Old Market in Roseau (45 min)" },
-            { name: "Scotts Head", lat: 15.2258, lng: -61.3667, description: "13:00 - Vertrek naar Scotts Head (45 min rijden)" },
-            { name: "Scotts Head Punt", lat: 15.2209, lng: -61.3688, description: "13:45 - Snorkelen & uitzichtpunt Scotts Head (1,5 u) en terug naar Canefield" }
+            { name: "Scotts Head Punt", lat: 15.2209, lng: -61.3688, description: "13:00 - Snorkelen & uitzichtpunt Scotts Head (1,5 u) en terug naar Canefield" }
         ],
         route: [
             { lat: 15.328927, lng: -61.3881073 }, // Canefield
             { lat: 15.2608, lng: -61.3731 }, // Champagne Reef
             { lat: 15.3017, lng: -61.3881 }, // Roseau
             { lat: 15.2984, lng: -61.3871 }, // Old Market
-            { lat: 15.2258, lng: -61.3667 }, // Scotts Head
             { lat: 15.2209, lng: -61.3688 }  // Scotts Head Punt
         ],
-        routeMapLink: "https://www.google.com/maps/dir/Canefield,+Dominica/Champagne+Reef,+Pointe+Michel,+Dominica/Roseau,+Dominica/Old+Market+of+Roseau,+Dominica/Scotts+Head,+Dominica/Scotts+Head+Point,+Dominica/Canefield,+Dominica/"
+        routeMapLink: "https://www.google.com/maps/dir/Canefield,+Dominica/Champagne+Reef,+Pointe+Michel,+Dominica/Roseau,+Dominica/Old+Market+of+Roseau,+Dominica/Scotts+Head+Point,+Dominica/Canefield,+Dominica/"
     },
     
     day4: { // 14 April - Zondag: Noordkust & Indian River
@@ -80,8 +78,7 @@ const reisdata = {
         waypoints: [
             { name: "Canefield", lat: 15.328927, lng: -61.3881073, description: "07:00 - Vroeg vertrek naar Mero Beach" },
             { name: "Mero Beach", lat: 15.4189776, lng: -61.4296712, description: "07:30 - Mero Beach (relaxen & zwemmen, 1 u)" },
-            { name: "Portsmouth", lat: 15.5758, lng: -61.4564, description: "09:00 - Aankomst Portsmouth" },
-            { name: "Indian River", lat: 15.5781, lng: -61.4611, description: "09:00 - Indian River Tour met gids (1,5 u)" },
+            { name: "Indian River (Tour boeken)", lat: 15.5781, lng: -61.4611, description: "09:00 - Indian River Tour met gids (1,5 u)" },
             { name: "Fort Shirley & Cabrits National Park", lat: 15.5864, lng: -61.4720, description: "10:30 - Fort Shirley & Cabrits National Park (1,5 u)" },
             { name: "Cold Soufrière", lat: 15.6193787, lng: -61.4398718, description: "12:00 - Cold Soufrière (30 min rijden + korte stop, 30 min)" },
             { name: "Batibou Bay", lat: 15.5965354, lng: -61.3696011, description: "13:00 - Batibou Bay (30 min rijden, 1,5 u zwemmen & relaxen)" },
@@ -90,14 +87,13 @@ const reisdata = {
         route: [
             { lat: 15.328927, lng: -61.3881073 }, // Canefield
             { lat: 15.4189776, lng: -61.4296712 }, // Mero Beach
-            { lat: 15.5758, lng: -61.4564 }, // Portsmouth
             { lat: 15.5781, lng: -61.4611 }, // Indian River
             { lat: 15.5864, lng: -61.4720 }, // Fort Shirley & Cabrits National Park
             { lat: 15.6193787, lng: -61.4398718 }, // Cold Soufrière
             { lat: 15.5965354, lng: -61.3696011 }, // Batibou Bay
             { lat: 15.5469, lng: -61.3000 }  // Luchthaven
         ],
-        routeMapLink: "https://www.google.com/maps/dir/Canefield,+Dominica/Mero+Beach,+Dominica/Portsmouth,+Dominica/Indian+River,+Portsmouth,+Dominica/Fort+Shirley,+Cabrits+National+Park,+Dominica/Cold+Soufriere,+Dominica/Batibou+Bay,+Dominica/Douglas-Charles+Airport,+Dominica/"
+        routeMapLink: "https://www.google.com/maps/dir/Canefield,+Dominica/Mero+Beach,+Dominica/Indian+River,+Portsmouth,+Dominica/Fort+Shirley,+Cabrits+National+Park,+Dominica/Cold+Soufriere,+Dominica/Batibou+Bay,+Dominica/Douglas-Charles+Airport,+Dominica/"
     }
 };
 
