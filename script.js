@@ -17,15 +17,18 @@ async function getEnvConfig() {
     // Check eerst of we de API-sleutel hebben in localStorage
     const savedKey = localStorage.getItem('GOOGLE_MAPS_API_KEY');
     
+    console.log("API-sleutel opzoeken...");
+    
     // Als we een opgeslagen sleutel hebben en we zijn niet in lokale ontwikkeling, gebruik deze
     if (savedKey && !window.location.href.includes('127.0.0.1') && !window.location.href.includes('localhost')) {
-        console.log("API-sleutel gevonden in lokale opslag");
+        console.log("API-sleutel gevonden in lokale opslag:", savedKey.substring(0, 5) + "...");
         return { GOOGLE_MAPS_API_KEY: savedKey };
     }
     
     // Lokale ontwikkeling: probeer het .env bestand te laden
     if (window.location.href.includes('127.0.0.1') || window.location.href.includes('localhost')) {
         try {
+            console.log("Lokale ontwikkeling: .env bestand laden");
             const response = await fetch('.env');
             const text = await response.text();
             
@@ -44,6 +47,7 @@ async function getEnvConfig() {
             // Sla de sleutel op voor toekomstig gebruik
             if (config.GOOGLE_MAPS_API_KEY) {
                 localStorage.setItem('GOOGLE_MAPS_API_KEY', config.GOOGLE_MAPS_API_KEY);
+                console.log("API-sleutel uit .env opgeslagen");
             }
             
             return config;
@@ -53,6 +57,7 @@ async function getEnvConfig() {
     }
     
     // Als we hier komen, hebben we geen sleutel gevonden. Vraag de gebruiker
+    console.log("Geen API-sleutel gevonden, prompt tonen");
     return promptForApiKey();
 }
 
@@ -86,6 +91,15 @@ function promptForApiKey() {
 // Functie om Google Maps API script dynamisch te laden
 function loadGoogleMapsScript(apiKey) {
     return new Promise((resolve, reject) => {
+        // Controleer eerst of de API al geladen is
+        if (window.google && window.google.maps) {
+            console.log("Google Maps API is al geladen");
+            resolve();
+            return;
+        }
+        
+        console.log("API script element aanmaken");
+        
         // Maak een script element aan
         const script = document.createElement('script');
         script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMapCallback`;
@@ -94,29 +108,68 @@ function loadGoogleMapsScript(apiKey) {
         
         // Voeg een globale callback toe die Promise zal resolveren
         window.initMapCallback = function() {
+            console.log("Google Maps API succesvol geladen via callback");
             resolve();
             delete window.initMapCallback;
         };
         
         // Error handler
-        script.onerror = function() {
-            reject(new Error('Google Maps script failed to load.'));
+        script.onerror = function(error) {
+            console.error("Google Maps script failed to load:", error);
+            
+            // Verwijder de API-sleutel omdat deze mogelijk ongeldig is
+            localStorage.removeItem('GOOGLE_MAPS_API_KEY');
+            
+            // Toon de foutmelding en een link om het opnieuw te proberen
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+                mapContainer.innerHTML = `
+                    <div style="padding: 20px; text-align: center; background-color: #ffeeee; border: 1px solid #ff0000; border-radius: 5px;">
+                        <h3>Er kon geen verbinding worden gemaakt met de Google Maps API</h3>
+                        <p>Je API-sleutel is mogelijk ongeldig of heeft onvoldoende rechten.</p>
+                        <p>Controleer de volgende zaken:</p>
+                        <ul style="text-align: left; display: inline-block;">
+                            <li>Je API-sleutel is correct</li>
+                            <li>De Maps JavaScript API is ingeschakeld in je Google Cloud Console</li>
+                            <li>De Places API is ingeschakeld</li>
+                            <li>De Directions API is ingeschakeld</li>
+                        </ul>
+                        <p><a href="?reset_api_key=true" style="color: blue; text-decoration: underline;">Klik hier om een nieuwe API-sleutel in te voeren</a></p>
+                    </div>
+                `;
+            }
+            
+            reject(new Error('Google Maps script failed to load. API key may be invalid.'));
         };
         
         // Voeg script toe aan DOM
         document.head.appendChild(script);
+        console.log("Google Maps API script toegevoegd aan de pagina");
     });
 }
 
 // Start de applicatie
 async function startApp() {
     try {
+        console.log("Applicatie starten...");
+        
         // Haal de configuratie op uit het .env bestand
         const config = await getEnvConfig();
         
+        console.log("Config opgehaald, API-sleutel aanwezig:", !!config.GOOGLE_MAPS_API_KEY);
+        
+        if (!config.GOOGLE_MAPS_API_KEY) {
+            throw new Error("Geen geldige API-sleutel gevonden!");
+        }
+        
         // Haal de API-sleutel uit de configuratie
         const apiKey = config.GOOGLE_MAPS_API_KEY;
+        console.log("Laden van Google Maps API met sleutel:", apiKey.substring(0, 5) + "...");
+        
+        // Laad de Google Maps API
         await loadGoogleMapsScript(apiKey);
+        
+        console.log("Google Maps API geladen, kaart initialiseren...");
         
         // Initialiseer de kaart na het laden van de API
         initMap();
@@ -128,10 +181,19 @@ async function startApp() {
                 infoWindow.close();
             }
         };
+        
+        console.log("Applicatie succesvol gestart!");
     } catch (error) {
         console.error("Fout bij het starten van de applicatie:", error);
         document.getElementById('map').innerHTML = 
-            '<div style="padding: 20px; text-align: center;">Er is een fout opgetreden bij het laden van de kaart. Probeer de pagina te vernieuwen.</div>';
+            '<div style="padding: 20px; text-align: center; color: red; background-color: #ffeeee; border: 1px solid #ff0000; border-radius: 5px;">' +
+            '<h3>Er is een fout opgetreden bij het laden van de kaart</h3>' +
+            '<p>' + error.message + '</p>' +
+            '<p>Probeer de pagina te vernieuwen of controleer je API-sleutel.</p>' +
+            '<button onclick="localStorage.removeItem(\'GOOGLE_MAPS_API_KEY\'); window.location.reload();" ' +
+            'style="padding: 8px 16px; background-color: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">' +
+            'API-sleutel verwijderen en opnieuw proberen</button>' +
+            '</div>';
     }
 }
 

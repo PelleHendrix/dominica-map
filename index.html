@@ -152,18 +152,6 @@
         </div>
     </footer>
     
-    <!-- Activity colors -->
-    <script>
-        const ACTIVITY_COLORS = {
-            "zwemmen": "#00BCD4",
-            "wandelen": "#8BC34A",
-            "cultuur": "#9C27B0",
-            "natuur": "#4CAF50",
-            "relaxen": "#FF9800",
-            "vervoer": "#607D8B"
-        };
-    </script>
-    
     <!-- Reis data -->
     <script src="data.js"></script>
     
@@ -178,8 +166,19 @@
             
             // Toon of verberg de overlay op basis van of de sleutel is opgeslagen
             const overlay = document.getElementById('api-key-overlay');
-            if (savedKey) {
+            
+            // Als er geen opgeslagen API-sleutel is, of als deze niet geldig is (als er een fout is)
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceOverlay = urlParams.get('reset_api_key');
+            
+            console.log("Overlay controleren, opgeslagen sleutel:", savedKey ? "ja" : "nee");
+            
+            if (!savedKey || forceOverlay === "true") {
+                overlay.style.display = 'flex'; // zorg ervoor dat dit 'flex' is, niet 'block'
+                console.log("Overlay wordt getoond");
+            } else {
                 overlay.style.display = 'none';
+                console.log("Overlay wordt verborgen (sleutel gevonden)");
             }
             
             // Verwerk het formulier
@@ -189,7 +188,11 @@
                 const apiKeyInput = document.getElementById('api-key-input');
                 const apiKey = apiKeyInput.value.trim();
                 
+                console.log("API-sleutel formulier verzonden");
+                
                 if (apiKey) {
+                    console.log("Sleutel ingevoerd, wordt opgeslagen");
+                    
                     // Sla de API-sleutel op in localStorage
                     localStorage.setItem('GOOGLE_MAPS_API_KEY', apiKey);
                     
@@ -199,6 +202,7 @@
                     // Pagina vernieuwen om de kaart te laden met de nieuwe sleutel
                     window.location.reload();
                 } else {
+                    console.log("Geen geldige sleutel ingevoerd");
                     alert("Voer een geldige API-sleutel in");
                 }
             });
