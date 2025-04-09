@@ -198,14 +198,26 @@ function showDay(day) {
     // Vul de locatielijst
     populateLocationsList(day);
     
-    // Voeg markers toe
-    addMarkers(data.waypoints, data.color);
+    // Markers toevoegen en route tekenen
+    addMarkers(data.waypoints, data.color, day);
     
-    // Teken route met Google Directions
-    drawRoute(data.waypoints, data.color, day);
+    // Teken de route
+    if (data.route && data.route.length > 1) {
+        if (data.route.length <= 10) {
+            calculateRouteSegments(data.route, day, data.color);
+        } else {
+            // Teken een simpele route als er meer dan 10 punten zijn (limitations van Directions API)
+            drawSimpleRoute(data.route, data.color);
+        }
+    }
     
-    // Zoom naar de route
+    // Zoom naar de dag
     zoomToFit(data.waypoints);
+    
+    // Bereken rijtijden voor segments
+    if (data.waypoints.length > 1) {
+        calculateSegmentTimes(data.waypoints, day);
+    }
 }
 
 // Toon alle dagen
@@ -223,7 +235,7 @@ function showAllDays() {
         const data = reisdata[day];
         if (data) {
             // Markers toevoegen
-            addMarkers(data.waypoints, data.color);
+            addMarkers(data.waypoints, data.color, day);
             
             // Route tekenen
             drawRoute(data.waypoints, data.color, day);
@@ -374,61 +386,82 @@ function populateLocationsListAllDays() {
     });
 }
 
-// Maak een locatie-item aan voor de lijst
+// Functie om locatie-items in de lijst te maken
 function createLocationItem(point, index, day) {
-    const locationItem = document.createElement('div');
-    locationItem.className = 'location-item';
-    locationItem.dataset.day = day;
-    locationItem.dataset.index = index;
+    const item = document.createElement('div');
+    item.className = 'location-item';
+    item.dataset.day = day;
+    item.dataset.index = index;
     
-    // Titel
-    const title = document.createElement('h3');
-    title.textContent = `${index + 1}. ${point.name}`;
-    
-    // Als het Rosalie Bay Airbnb is (dag 1, punt 4), voeg een directe link toe
-    if (point.directMapLink) {
-        // Maken van de link container
-        const linkContainer = document.createElement('div');
-        linkContainer.className = 'direct-link-container';
-        
-        // Maken van de directe link
-        const directLink = document.createElement('a');
-        directLink.href = point.directMapLink;
-        directLink.target = '_blank';
-        directLink.className = 'airbnb-direct-link';
-        directLink.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#4285F4" style="vertical-align: middle; margin-right: 5px;">
-                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
-            </svg>
-            Directe link naar Airbnb locatie
-        `;
-        
-        // Voorkom dat de klik op de link ook de locatie activeert
-        directLink.addEventListener('click', function(event) {
-            event.stopPropagation();
-        });
-        
-        linkContainer.appendChild(directLink);
-        
-        // Voeg de link container toe onder de titel
-        locationItem.appendChild(title);
-        locationItem.appendChild(linkContainer);
-    } else {
-        locationItem.appendChild(title);
+    // Bepaal de kleur (of standaard)
+    let color = reisdata[day].color;
+    // Gebruik de activiteitskleur als deze beschikbaar is
+    if (point.activityType && ACTIVITY_COLORS[point.activityType]) {
+        color = ACTIVITY_COLORS[point.activityType];
     }
     
-    // Beschrijving
-    const description = document.createElement('p');
-    description.textContent = point.description || '';
+    // Locatie-indicator met nummer
+    const indicator = document.createElement('div');
+    indicator.className = 'location-indicator';
+    indicator.style.backgroundColor = color;
+    indicator.textContent = (index + 1).toString();
+    item.appendChild(indicator);
     
-    locationItem.appendChild(description);
+    // Informatie container
+    const info = document.createElement('div');
+    info.className = 'location-info';
     
-    // Klikgebeurtenisluisteraar
-    locationItem.addEventListener('click', function() {
-        highlightLocation(this);
+    // Locatienaam
+    const name = document.createElement('div');
+    name.className = 'location-name';
+    name.textContent = point.name;
+    info.appendChild(name);
+    
+    // Locatiebeschrijving
+    if (point.description) {
+        const description = document.createElement('div');
+        description.className = 'location-description';
+        description.textContent = point.description;
+        info.appendChild(description);
+    }
+    
+    // Activiteitstype toevoegen als badge
+    if (point.activityType) {
+        const activityBadge = document.createElement('div');
+        activityBadge.className = 'activity-badge';
+        activityBadge.style.backgroundColor = ACTIVITY_COLORS[point.activityType] || '#999';
+        activityBadge.textContent = point.activityType.charAt(0).toUpperCase() + point.activityType.slice(1);
+        info.appendChild(activityBadge);
+    }
+    
+    // Informatie over rijtijd naar volgende locatie (later in te vullen)
+    if (index < reisdata[day].waypoints.length - 1) {
+        const driveTimeElement = document.createElement('div');
+        driveTimeElement.className = 'drive-time';
+        driveTimeElement.id = `drive-time-${day}-${index}`;
+        driveTimeElement.innerHTML = '<i class="fas fa-car"></i> Berekenen...';
+        info.appendChild(driveTimeElement);
+    }
+    
+    item.appendChild(info);
+    
+    // Voeg Google Maps link toe indien aanwezig
+    if (point.directMapLink) {
+        const mapLink = document.createElement('a');
+        mapLink.href = point.directMapLink;
+        mapLink.className = 'map-link';
+        mapLink.target = '_blank';
+        mapLink.innerHTML = '<i class="fas fa-map-marked-alt"></i>';
+        mapLink.title = 'Bekijk in Google Maps';
+        item.appendChild(mapLink);
+    }
+    
+    // Event listener om de locatie te highlighten
+    item.addEventListener('click', () => {
+        highlightLocation(item);
     });
     
-    return locationItem;
+    return item;
 }
 
 // Highlight een locatie wanneer erop wordt geklikt
@@ -517,102 +550,88 @@ function zoomToLocationWithContext(position, day) {
     }
 }
 
-// Markers toevoegen aan de kaart
-function addMarkers(waypoints, color) {
-    // Controleer op dubbele coördinaten en vermijd overlappende markers
-    const usedCoordinates = new Map(); // Gebruikt om dubbele locaties bij te houden
-    
+// Functie om markers toe te voegen
+function addMarkers(waypoints, defaultColor, day) {
     waypoints.forEach((point, index) => {
-        // Maak een unieke sleutel voor de coördinaten
-        const coordKey = `${point.lat.toFixed(4)},${point.lng.toFixed(4)}`;
-        
-        // Controleer of deze coördinaten al een marker hebben
-        if (usedCoordinates.has(coordKey)) {
-            // Voeg een kleine offset toe aan de marker om overlap te voorkomen
-            const offset = 0.0005 * (usedCoordinates.get(coordKey) + 1); // Verhoog offset voor elke duplicaat
-            point.lat += offset;
-            point.lng += offset;
-            usedCoordinates.set(coordKey, usedCoordinates.get(coordKey) + 1);
-        } else {
-            usedCoordinates.set(coordKey, 0); // Eerste keer dat we deze coördinaat zien
+        // Gebruik activiteitskleur indien beschikbaar, anders de dagkleur
+        let color = defaultColor;
+        if (point.activityType && ACTIVITY_COLORS[point.activityType]) {
+            color = ACTIVITY_COLORS[point.activityType];
         }
         
-        // Grotere schaal voor rode markers (dag 1)
-        const markerScale = color === DAY_COLORS.day1 ? 16 : 12;
-        const fontSize = color === DAY_COLORS.day1 ? '16px' : '12px';
-        const fontWeight = color === DAY_COLORS.day1 ? 'bold' : 'normal';
+        // Maak een custom marker icon
+        const markerIcon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: color,
+            fillOpacity: 0.9,
+            strokeWeight: 2,
+            strokeColor: '#FFFFFF',
+            scale: 14,
+            labelOrigin: new google.maps.Point(0, 0)
+        };
         
+        // Maak een custom label
+        const label = {
+            text: (index + 1).toString(),
+            color: '#FFFFFF',
+            fontSize: '14px',
+            fontWeight: 'bold'
+        };
+        
+        // Marker toevoegen met label
         const marker = new google.maps.Marker({
             position: { lat: point.lat, lng: point.lng },
             map: map,
+            icon: markerIcon,
+            label: label,
             title: point.name,
-            label: {
-                text: (index + 1).toString(),
-                color: 'white',
-                fontSize: fontSize,
-                fontWeight: fontWeight
-            },
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                fillColor: color,
-                fillOpacity: 1,
-                strokeColor: 'white',
-                strokeWeight: 2,
-                scale: markerScale
-            }
+            optimized: false, // Nodig voor betere z-index stacking
+            zIndex: 1000 + index
         });
         
-        // Sla marker-referentie op
-        const markerKey = `${activeDay}-${index}`;
-        markerMapping[markerKey] = marker;
-        
-        // InfoWindow toevoegen met verbeterde stijl
+        // InfoWindow toevoegen aan marker
         marker.addListener('click', () => {
-            // Voeg een directe link toe aan de infoWindow als die bestaat
-            let directLinkHtml = '';
-            if (point.directMapLink) {
-                directLinkHtml = `
-                    <div style="margin-top: 10px;">
-                        <a href="${point.directMapLink}" target="_blank" style="color: #4285F4; text-decoration: none; display: flex; align-items: center;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#4285F4" style="margin-right: 5px;">
-                                <path d="M12 0c-4.198 0-8 3.403-8 7.602 0 4.198 3.469 9.21 8 16.398 4.531-7.188 8-12.2 8-16.398 0-4.199-3.801-7.602-8-7.602zm0 11c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
-                            </svg>
-                            Directe link naar locatie
-                        </a>
-                    </div>
-                `;
+            // Sluit bestaande infoWindow
+            infoWindow.close();
+            
+            // Maak HTML voor infoWindow
+            let contentString = `
+                <div class="info-window">
+                    <h3>${point.name}</h3>`;
+            
+            if (point.description) {
+                contentString += `<p>${point.description}</p>`;
             }
             
-            // Maak een gecodeerde zoekquery voor Google
-            const searchQuery = encodeURIComponent(`${point.name} dominica`);
-            const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+            if (point.activityType) {
+                contentString += `
+                    <div class="activity-type" style="background-color: ${ACTIVITY_COLORS[point.activityType] || '#999'}">
+                        ${point.activityType.charAt(0).toUpperCase() + point.activityType.slice(1)}
+                    </div>`;
+            }
             
-            const infoContent = `
-                <div class="info-window" style="min-width: 250px; padding: 5px;">
-                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">${point.name}</div>
-                    <div style="font-size: 14px;">${point.description || ''}</div>
-                    ${directLinkHtml}
-                    <div style="margin-top: 10px; background-color: #4CAF50; padding: 8px; border-radius: 4px;">
-                        <a href="${googleSearchUrl}" target="_blank" style="color: white; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" style="margin-right: 5px;">
-                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
-                            Zoeken naar ${point.name}
-                        </a>
-                    </div>
-                </div>`;
+            if (point.directMapLink) {
+                contentString += `
+                    <a href="${point.directMapLink}" target="_blank" class="map-link-button">
+                        <i class="fas fa-map-marked-alt"></i> In Google Maps openen
+                    </a>`;
+            }
             
-            infoWindow.setContent(infoContent);
+            contentString += `</div>`;
+            
+            // Open InfoWindow op de marker
+            infoWindow.setContent(contentString);
             infoWindow.open(map, marker);
             
-            // Activeer bijbehorend locatie-item
-            highlightLocationByMarker(activeDay, index);
-            
-            // Zoom naar de locatie met context
-            zoomToLocationWithContext(marker.getPosition(), activeDay);
+            // Highlight de bijbehorende locatie in de lijst
+            highlightLocationByMarker(day, index);
         });
         
+        // Marker toevoegen aan de array
         markers.push(marker);
+        
+        // Marker koppelen aan locatie-item
+        markerMapping[`${day}-${index}`] = marker;
     });
 }
 

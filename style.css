@@ -101,6 +101,9 @@ button .color-dot {
     border-bottom: 1px solid #eee;
     cursor: pointer;
     transition: background-color 0.2s;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
 }
 
 .location-item:hover {
@@ -229,6 +232,141 @@ button .color-dot {
     background-color: #4CAF50; /* Groen */
 }
 
+/* Stijlen voor locatie-items met activiteitstype */
+.location-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.location-info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.location-name {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.location-description {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.activity-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    font-weight: bold;
+}
+
+.map-link {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #4285F4;
+    font-size: 1.2rem;
+}
+
+.drive-time {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Stijlen voor infoWindow activiteitstype */
+.info-window {
+    padding: 10px;
+    min-width: 200px;
+}
+
+.info-window h3 {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.info-window p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.activity-type {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.map-link-button {
+    display: block;
+    padding: 8px 12px;
+    background-color: #4285F4;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.map-link-button:hover {
+    background-color: #3367D6;
+}
+
+/* Stijlen voor activiteiten-legenda */
+.activity-legend {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.activity-legend h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.legend-label {
+    font-size: 14px;
+}
+
 /* Responsive aanpassingen */
 @media (max-width: 768px) {
     body {
@@ -262,6 +400,14 @@ button .color-dot {
     button {
         padding: 6px 8px;
         font-size: 0.8rem;
+    }
+    
+    .legend-items {
+        justify-content: flex-start;
+    }
+    
+    .legend-item {
+        width: calc(50% - 10px);
     }
 }
 
@@ -301,5 +447,9 @@ button .color-dot {
     .google-maps-button {
         font-size: 0.8rem;
         padding: 6px;
+    }
+    
+    .legend-item {
+        width: 100%;
     }
 } 
